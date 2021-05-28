@@ -1,0 +1,158 @@
+-- general
+SHOW VARIABLES WHERE Variable_name LIKE "version";
+SHOW DATABASES LIKE 'test';
+
+-- local_infile
+SHOW VARIABLES WHERE Variable_name = 'local_infile';
+
+-- skip-symbolic-links
+SHOW variables LIKE 'have_symlink';
+
+-- daemon_memcached
+SELECT * FROM information_schema.plugins WHERE PLUGIN_NAME='daemon_memcached';
+
+-- secure_file_priv
+SHOW GLOBAL VARIABLES WHERE Variable_name = 'secure_file_priv' AND Value<>'';
+
+-- sql_mode
+SHOW VARIABLES LIKE 'sql_mode';
+
+-- Permissions
+SELECT user, host
+FROM mysql.user
+WHERE (Select_priv = 'Y')
+OR (Insert_priv = 'Y')
+OR (Update_priv = 'Y')
+OR (Delete_priv = 'Y')
+OR (Create_priv = 'Y')
+OR (Drop_priv = 'Y');
+SELECT user, host
+FROM mysql.db
+WHERE db = 'mysql'
+AND ((Select_priv = 'Y')
+OR (Insert_priv = 'Y')
+OR (Update_priv = 'Y')
+OR (Delete_priv = 'Y')
+OR (Create_priv = 'Y')
+OR (Drop_priv = 'Y'));
+
+-- file_priv
+select user, host from mysql.user where File_priv = 'Y';
+
+-- process_priv
+select user, host from mysql.user where Process_priv = 'Y';
+
+-- super_priv
+select user, host from mysql.user where Super_priv = 'Y';
+
+-- shutdown_priv
+SELECT user, host FROM mysql.user WHERE Shutdown_priv = 'Y';
+
+-- create_user_priv
+SELECT user, host FROM mysql.user WHERE Create_user_priv = 'Y';
+
+-- grant_priv
+SELECT user, host FROM mysql.user WHERE Grant_priv = 'Y';
+SELECT user, host FROM mysql.db WHERE Grant_priv = 'Y';
+
+-- repl_slave_priv
+SELECT user, host FROM mysql.user WHERE Repl_slave_priv = 'Y';
+
+-- DML_DDL_Grants
+SELECT User,Host,Db
+FROM mysql.db
+WHERE Select_priv='Y'
+OR Insert_priv='Y'
+OR Update_priv='Y'
+OR Delete_priv='Y'
+OR Create_priv='Y'
+OR Drop_priv='Y'
+OR Alter_priv='Y';
+
+-- Auditing and Logging
+SHOW variables LIKE 'log_error';
+
+-- log files are stored on a non-system partition
+SELECT @@global.log_bin_basename;
+
+-- log_warnings
+SHOW GLOBAL VARIABLES LIKE 'log_warnings';
+-- log_raw
+-- open mysql configuration file (my.cnf), ensure log-raw is present and set to off.
+
+-- audit_log_connection_policy
+show variables like '%audit_log_connection_policy%';
+
+-- audit_log_exclude_accounts
+SHOW VARIABLES LIKE '%audit_log_exclude_accounts%';
+
+-- audit_log_include_accounts
+SHOW VARIABLES LIKE '%audit_log_include_accounts%';
+
+-- audit_log_policy
+SHOW GLOBAL VARIABLES LIKE 'audit_log_policy';
+SHOW GLOBAL VARIABLES LIKE 'audit_log_policy';
+
+-- audit_log_statement_policy
+SHOW GLOBAL VARIABLES LIKE 'audit_log_statement_policy';
+
+-- audit_log_strategy to SYNCHRONOUS or SEMISYNCHRONOUS
+SHOW GLOBAL VARIABLES LIKE 'audit_log_strategy';
+
+-- audit_plugin
+SELECT LOAD_OPTION FROM information_schema.plugins WHERE PLUGIN_NAME='audit_log';
+
+-- Authentication
+-- 'old_passwords'
+SHOW VARIABLES WHERE Variable_name = 'old_passwords';
+
+-- sec_auth
+SHOW VARIABLES WHERE Variable_name = 'secure_auth';
+
+-- ensure 7.3
+-- sql_mode
+SELECT @@global.sql_mode;
+SELECT @@session.sql_mode;
+
+-- passwords are set for all
+SELECT User,host
+FROM mysql.user
+WHERE (plugin IN('mysql_native_password', 'mysql_old_password')
+AND (LENGTH(Password) = 0
+OR Password IS NULL))
+OR (plugin='sha256_password' AND LENGTH(authentication_string) = 0);
+
+-- password policy
+SHOW VARIABLES LIKE 'validate_password%';
+SELECT User,Password,Host FROM mysql.user
+WHERE password=CONCAT('*', UPPER(SHA1(UNHEX(SHA1(user)))));
+
+-- wildcard_hostnames
+SELECT user, host FROM mysql.user WHERE host = '%';
+
+-- anonymous_accounts_exits
+SELECT user,host FROM mysql.user WHERE user = '';
+
+-- network
+-- have_ssl
+SHOW variables WHERE variable_name = 'have_ssl';
+
+-- ssl_type
+SELECT user, host, ssl_type FROM mysql.user
+WHERE NOT HOST IN ('::1', '127.0.0.1', 'localhost');
+
+-- replication
+-- replication_traffic
+
+-- master_ssl_verify
+select ssl_verify_server_cert from mysql.slave_master_info;
+
+-- master_info_repository
+SHOW GLOBAL VARIABLES LIKE 'master_info_repository';
+
+-- super_priv
+select user, host from mysql.user where user='repl' and Super_priv = 'Y';
+
+-- no_replication_users_have_wildcard_hostnames
+SELECT user, host FROM mysql.user WHERE user='repl' AND host = '%';
+
